@@ -16,16 +16,17 @@ class Dict { // Dict/HashMap    varNm[key] で参照できる非Object型
             },
             get(target, key, receiver) {
                 if ('typeName'===key) { return 'Proxy(Dict)' }
-                if (key.startsWith('[') && key.endsWith(']')) {
-                    const k = key.slice(1, key.length-2)
-                    if (target.has(k)) { return target.get(k) }
-                }
+                console.log(target, key)
                 if (key in target) {
                     if (Type.hasGetter(target, key)) { return Reflect.get(target, key) } // ゲッター
                     else if ('function'===typeof target[key]) { return target[key].bind(target) } // メソッド参照
                     return target[key] // プロパティ値
                 }
                 if (target.has(key)) { return target.get(key) }
+                if (key.startsWith('[') && key.endsWith(']')) {
+                    const k = key.slice(1, key.length-2)
+                    if (target.has(k)) { return target.get(k) }
+                }
                 throw new ReferenceError(`Does not exist: ${key}`)
             },
         })

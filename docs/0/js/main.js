@@ -33,10 +33,19 @@ window.addEventListener('DOMContentLoaded', (event) => {
         const N = ns({a:{A:'A'}})
         N.a = 'a'
     })
+    // 末端のオブジェクトAも名前空間になってしまう（それは名前空間でなく値としてのオブジェクトであってほしい）
     a.e(NamespaceError, `Cannot be assigned to a Namespace.`, ()=>{
         const N = ns({a:{A:'A'}})
-        N.a.A = 'a'
+        a.t('Proxy(Namespace)'===N.a.typeName)
+        N.a.A = 'a' // A は名前空間になってしまう
     })
+    // Dictを使う（末端のオブジェクトをオブジェクト風の値にするための型Dict）
+    a.t(()=>{
+        const N = ns({a:Dict.of({A:'A'})})
+        N.a.A = 'X'
+        return 'X'===N.a.A && 'Proxy(Dict)'===N.a.typeName; // AはDict型（辞書風の変数として使える）
+    })
+
     a.fin()
 });
 window.addEventListener('beforeunload', (event) => {
