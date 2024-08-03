@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title></title>
+<meta name="description" content="">
+<meta name="author" content="ytyaru">
+<link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.ja">
+<link rel="icon" href="../asset/image/author/ytyaru.png">
+<link rel="stylesheet" href="css/style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../lib/van/1.2.6/nomodule.min.js"></script>
+<script src="../lib/util/type.js"></script>
+<script src="../lib/util/test/assertion.js"></script>
+<script src="../lib/util/test/black-box.js"></script>
+<script src="../js/footer.js"></script>
+<script src="js/dict.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', (event) => {
+//window.addEventListener('load', (event) => {
+    const a = new Assertion()
+    const bb = new BlackBox(a)
+//    a.t('Dict' in window)
+    const ERR_NEW = `引数は{k:'v',...}か[[key, value],...]のみ有効です。キーと値の組合せが一つ以上必要です。キーは文字列型のみ有効です。`
+    a.t(Type.isCls(Dict))
+    a.t('Proxy(Dict)'===Dict.of({k:1}).typeName)
+    a.t('Proxy(Dict)'===(new Dict({k:1})).typeName)
+    a.e(TypeError, ERR_NEW, ()=>new Dict())
+    a.e(TypeError, ERR_NEW, ()=>new Dict(0))
+    a.e(TypeError, ERR_NEW, ()=>new Dict([]))
+    a.e(TypeError, ERR_NEW, ()=>new Dict([[]]))
+    a.e(TypeError, ERR_NEW, ()=>new Dict([['']]))
+    a.e(TypeError, ERR_NEW, ()=>new Dict([['',''], ['']]))
+    a.e(TypeError, ERR_NEW, ()=>new Dict({}))
+    bb.test(Dict, [
+        [[], TypeError, ERR_NEW],
+        [[0], TypeError, ERR_NEW],
+        [[[]], TypeError, ERR_NEW],
+        [[[[]]], TypeError, ERR_NEW],
+        [[ [['']] ], TypeError, ERR_NEW],
+        [[ [['',''],['']] ], TypeError, ERR_NEW],
+        [[{}], TypeError, ERR_NEW],
+    ])
+    bb.test(TypeError, ERR_NEW, [
+        [],
+        [0],
+        [[]],
+        [[[]]],
+        [[['']]],
+        [[['',''],['']]],
+        [{}],
+    ])
+    bb.test(Dict, [
+        [[ [['k','v']] ], (d)=>'v'===d.k],
+        [[ [['k','v']] ], (d)=>'v'===d['k']],
+        [[ [['k','v']] ], (d)=>{d.k='X';return 'X'===d.k}],
+        [[ [['k','v']] ], (d)=>{d['k']='Y';return 'Y'===d['k']}],
+        [[ [['k','v']] ], (d)=>{d.k='Z';return 'Z'===d['k']}],
+        [[ [['k','v']] ], (d)=>{d['k']='A';return 'A'===d.k}],
+    ])
+    a.e(TypeError, ERR_NEW, ()=>Dict.of())
+    a.e(TypeError, ERR_NEW, ()=>Dict.of(0))
+    a.e(TypeError, ERR_NEW, ()=>Dict.of([]))
+    a.e(TypeError, ERR_NEW, ()=>Dict.of([[]]))
+    a.e(TypeError, ERR_NEW, ()=>Dict.of([['']]))
+    a.e(TypeError, ERR_NEW, ()=>Dict.of([['',''], ['']]))
+    a.e(TypeError, ERR_NEW, ()=>Dict.of({}))
+    bb.test(Dict, 'of', [
+        [[ [['k','v']] ], (d)=>'v'===d.k],
+        [[ [['k','v']] ], (d)=>'v'===d['k']],
+        [[ [['k','v']] ], (d)=>{d.k='X';return 'X'===d.k}],
+        [[ [['k','v']] ], (d)=>{d['k']='Y';return 'Y'===d['k']}],
+        [[ [['k','v']] ], (d)=>{d.k='Z';return 'Z'===d['k']}],
+        [[ [['k','v']] ], (d)=>{d['k']='A';return 'A'===d.k}],
+    ])
+
+    bb.test(Dict, 'of', [
+        [[ [['','']] ], (d)=>''===d[''] ], // d.では参照不能
+        [[ [['k','v','z']] ], (d)=>'v'===d['k'] ], // z は無視される
+    ])
+    a.fin()
+})
+</script>
+</html>
+<!-- https://coliss.com/articles/build-websites/operation/work/html-template-for-web-apps-or-sites.html -->
+<!-- https://coliss.com/articles/build-websites/operation/work/html5-template-for-2018.html -->
